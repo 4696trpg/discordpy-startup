@@ -7,10 +7,27 @@ token = os.environ['DISCORD_BOT_TOKEN']
 
 
 @bot.event
-async def on_command_error(ctx, error):
-    orig_error = getattr(error, "original", error)
-    error_msg = ''.join(traceback.TracebackException.from_exception(orig_error).format())
-    await ctx.send(error_msg)
+async def on_message(message):
+    matchDice = re.search(r'1d100 <= (\d+)', message.content)
+    
+    # 1d100 <= '数字' で1d100の判定が出来る
+    if matchDice:
+        num = randNum()
+        targetNum = matchDice.group(1)
+        resultMessage = '1D100 <= ' + str(targetNum) + '→' + str(num)
+        if num <= int(targetNum):
+            await client.send_message(message.channel, resultMessage + '成功')
+        else:
+            await client.send_message(message.channel, resultMessage + '失敗')
+    # お試し100面ダイス振るだけよう
+    elif message.content == '1d100':
+        num = randNum()
+        await client.send_message(message.channel, str(num) + 'だよ')
+
+def randNum():
+    # 乱数精製
+    randomNum = random.randint(1,100)
+    return randomNum
 
 
 @bot.command()
