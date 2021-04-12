@@ -1,21 +1,18 @@
-from discord.ext import commands
-import os
-import traceback
+import discord
+import nDnDICE
 
-bot = commands.Bot(command_prefix='/')
-token = os.environ['DISCORD_BOT_TOKEN']
+client = discord.Client()
 
+@client.event
+async def on_ready():
+    print('Botを起動しました。')
 
-@bot.event
-async def on_command_error(ctx, error):
-    orig_error = getattr(error, "original", error)
-    error_msg = ''.join(traceback.TracebackException.from_exception(orig_error).format())
-    await ctx.send(error_msg)
-
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send('pong')
-
-
-bot.run(token)
+@client.event
+async def on_message(message):
+    msg = message.content
+    result = nDnDICE.nDn(msg)
+    if result is not None:
+        await client.send_message(message.channel, result)
+    
+#ここにbotのアクセストークンを入力
+client.run('ODMwOTY1OTk4MDgwODg0NzU3.YHOXZA.-DziZG-Fb-_9G5kaNcHfm6Rkc2Q')
